@@ -1,0 +1,15 @@
+[project]
+name = "db-utils"
+version = "0.1.0"
+description = "DB tools"
+authors = [{name = "Jan Cakl"}]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["psycopg2", "python-dotenv>=1.0"]
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.package-data]
+db_utils = ["py.typed"]

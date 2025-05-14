@@ -1,0 +1,8 @@
+psycopg2
+types-psycopg2
+mypy
+black==25.1.0
+isort
+flake8
+bandit
+python-dotenv
