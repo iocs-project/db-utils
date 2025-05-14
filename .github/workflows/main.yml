@@ -1,0 +1,59 @@
+name: Test db_utils
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test_username
+          POSTGRES_PASSWORD: test_password
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          pip install -e .
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Wait for PostgreSQL
+        run: |
+          until pg_isready -h localhost -p 5432; do sleep 1; done
+      
+      - name: Lint with flake8
+        run: flake8 db_utils tests --max-line-length 120
+
+      - name: Check formatting with black
+        run: black --check db_utils tests
+
+      - name: Check imports with isort
+        run: isort --check-only db_utils tests
+      
+      - name: Type check with mypy
+        run: mypy db_utils tests
+      
+      - name: Check security issues
+        run: bandit -r ./db_utils/
+
+      - name: Run tests
+        run: pytest
